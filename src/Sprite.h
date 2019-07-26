@@ -63,6 +63,12 @@ namespace engine{
 		mVelX = 0;
 		mVelY = 0;
 
+		srcRect.x = texture->getWidth();
+		srcRect.y = 0;
+		srcRect.w = texture->getWidth();
+		srcRect.h = texture->getHeight();
+
+
 		mCollider.x = dstRect.x;
 		mCollider.y = dstRect.y;
 		mCollider.w = texture->getWidth();
@@ -103,6 +109,12 @@ namespace engine{
 		dstRect.y = y;
 		dstRect.w = 32;
 		dstRect.h = 32;
+
+		srcRect.x = texture->getWidth();
+		srcRect.y = 0;
+		srcRect.w = texture->getWidth();
+		srcRect.h = texture->getHeight();
+
 
 		mVelX = 0;
 		mVelY = 0;

@@ -7,8 +7,20 @@
 #include <stdio.h>
 #include <string>
 #include <util.h>
+#include <Tile.h>
 
 using namespace engine;
+
+bool touchesWall(SDL_Rect box, Tile* tiles[]){
+	for (int i = 0; i < TOTAL_TILES;++i){
+		if (tiles[i]->mType == 0 || tiles[i]->mType == 1){
+			if (checkCollision(box, tiles[i]->mCollider)){
+				return true;
+			}
+		}
+	}
+	return false;
+}
 
 namespace engine{
 	struct Sprite{
@@ -20,6 +32,8 @@ namespace engine{
 		void handleEvent(SDL_Event& e);
 		//void move();
 		void move(std::vector<Sprite*> tiles);
+		void move(Tile* tiles[]);
+		void setCamera(SDL_Rect& camera);
 		void render(int camX,int camY);
 
 
@@ -28,32 +42,6 @@ namespace engine{
 		Texture* spriteTexture;
 		SDL_Rect mCollider;
 	};
-
-
-	bool checkCollision(SDL_Rect& a, SDL_Rect& b){
-		int leftA,leftB;
-		int rightA, rightB;
-		int topA, topB;
-		int bottomA, bottomB;
-
-		leftA = a.x;
-		rightA = a.x + a.w;
-		topA = a.y;
-		bottomA = a.y + a.h;
-
-		leftB = b.x;
-		rightB = b.x + b.w;
-		topB = b.y;
-		bottomB = b.y + b.h;
-
-		if (bottomA <= topB)return false;
-		if (topA >= bottomB)return false;
-		if (rightA <= leftB)return false;
-		if (leftA >= rightB)return false;
-		//printf("collision in [%d, %d] and [%d, %d]\n", a.x,a.y,b.x,b.y);
-		return true;
-	}
-
 
 
 	Sprite::Sprite(int x,int y,Texture* texture){
@@ -132,10 +120,36 @@ namespace engine{
 	}
 
 
+	void Sprite::move(Tile* tiles[]){
+		mPosX += mVelX;
+		mCollider.x = mPosX;
+		if((mPosX < 0)||(mPosX + spriteTexture->getWidth()> LEVEL_WIDTH)|| (touchesWall(mCollider,tiles))){
+			mPosX -= mVelX;
+			mCollider.x = mPosX;
+		}
+		mPosY += mVelY;
+		mCollider.y = mPosY;
+		if((mPosY < 0)||(mPosY + spriteTexture->getHeight()> LEVEL_HEIGHT)||(touchesWall(mCollider,tiles))){
+			mPosY -= mVelY;
+			mCollider.y = mPosY;
+		}
+
+	}
+
+
 	void Sprite::render(int camX,int camY){
 		spriteTexture->render(mPosX-camX,mPosY-camY);	
 	}
 
+	void Sprite::setCamera( SDL_Rect& camera )
+	{
+		camera.x = (mPosX + spriteTexture->getWidth()/2) - SCREEN_WIDTH/2;
+		camera.y = (mPosY + spriteTexture->getHeight()/2) - SCREEN_HEIGHT/2;
+		if (camera.x < 0)camera.x = 0;
+		if (camera.y < 0)camera.y = 0;
+		if (camera.x > LEVEL_WIDTH - camera.w)camera.x = LEVEL_WIDTH - camera.w;
+		if (camera.y > LEVEL_HEIGHT - camera.h)camera.y = LEVEL_HEIGHT - camera.h;
+	}
 
 }
 

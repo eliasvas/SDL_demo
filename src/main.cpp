@@ -5,19 +5,20 @@
 #include <stdio.h>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <vector>
 #include <Texture.h>
 #include <Timer.h>
 #include <Sprite.h>
 #include <util.h>
+#include <Tile.h>
+
+
 using namespace engine;
-
-
 SDL_Window *gWindow = NULL;
 SDL_Texture *gTexture = NULL;
 TTF_Font *gFont = NULL;
 Mix_Music *gMusic = NULL;
-
 SDL_Rect playerClips[6];
 Texture backgroundTexture;
 Texture playerSheetTexture;
@@ -64,22 +65,6 @@ bool init(){
 }
 
 
-SDL_Texture* loadTexture(std::string path) {
-	SDL_Texture* newTexture = NULL;
-
-	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-	if (loadedSurface == NULL){
-		printf("failed to loaf image %s, SDL_Error: %S\n", path.c_str(), SDL_GetError());
-	}else {
-		newTexture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
-		if (newTexture == NULL)
-			printf("Unable to create texture, SDL_Error: %s\n", SDL_GetError());
-		SDL_FreeSurface(loadedSurface);
-	}
-	return newTexture;
-}
-
-
 
 void close() {
 	SDL_DestroyTexture(gTexture);
@@ -101,12 +86,128 @@ void close() {
 	TTF_Quit();
 	SDL_Quit();
 }
-bool loadMedia() {
+
+SDL_Texture* loadTexture(std::string path) {
+	SDL_Texture* newTexture = NULL;
+
+	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
+	if (loadedSurface == NULL){
+		printf("failed to loaf image %s, SDL_Error: %S\n", path.c_str(), SDL_GetError());
+	}else {
+		newTexture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
+		if (newTexture == NULL)
+			printf("Unable to create texture, SDL_Error: %s\n", SDL_GetError());
+		SDL_FreeSurface(loadedSurface);
+	}
+	return newTexture;
+}
+
+
+bool setTiles(Tile *tiles[] = NULL){
+	bool tilesLoaded = true;
+	int x = 0;
+	int y = 0;
+	std::ifstream map("../assets/level1.map");
+	if (map.fail())
+	{
+		printf("unable to load map!!\n");
+		tilesLoaded = false;
+	}else 
+	{
+		for (int i = 0; i < TOTAL_TILES;++i)
+		{
+			int tileType = -1;
+			map >> tileType;
+			//printf("%d\n",tileType);
+			if (map.fail())
+			{
+				printf("error reading file, unexpected EOF\n");
+				tilesLoaded = false;
+				break;
+			}
+
+			if ((tileType >= 0) && (tileType <TOTAL_TILE_SPRITES))
+			{
+				tiles[i] = new Tile(x,y,tileType);
+			}else
+			{
+				printf("invalid tile type at %d\n",i);
+				tilesLoaded = false;
+				break;
+			}
+			x += TILE_WIDTH;
+			if (x >=45 * 32) //45 is the width of the level
+			{
+				x = 0;
+				y+=TILE_HEIGHT;
+			}	
+			
+		}	
+		if (tilesLoaded)
+		{
+			tileClips[TILE_TOPLEFT].x = 0;
+			tileClips[TILE_TOPLEFT].y = 0;
+			tileClips[TILE_TOPLEFT].w = TILE_WIDTH;
+			tileClips[TILE_TOPLEFT].h = TILE_HEIGHT;
+
+			tileClips[TILE_TOP].x = 32;
+			tileClips[TILE_TOP].y = 0;
+			tileClips[TILE_TOP].w = TILE_WIDTH;
+			tileClips[TILE_TOP].h = TILE_HEIGHT;
+
+			tileClips[TILE_TOPRIGHT].x = 64;
+			tileClips[TILE_TOPRIGHT].y = 0;
+			tileClips[TILE_TOPRIGHT].w = TILE_WIDTH;
+			tileClips[TILE_TOPRIGHT].h = TILE_HEIGHT;
+
+			tileClips[TILE_LEFT].x = 0;
+			tileClips[TILE_LEFT].y = 32;
+			tileClips[TILE_LEFT].w = TILE_WIDTH;
+			tileClips[TILE_LEFT].h = TILE_HEIGHT;
+
+			tileClips[TILE_CENTER].x = 32;
+			tileClips[TILE_CENTER].y = 32;
+			tileClips[TILE_CENTER].w = TILE_WIDTH;
+			tileClips[TILE_CENTER].h = TILE_HEIGHT;
+
+			tileClips[TILE_RIGHT].x = 64;
+			tileClips[TILE_RIGHT].y = 32;
+			tileClips[TILE_RIGHT].w = TILE_WIDTH;
+			tileClips[TILE_RIGHT].h = TILE_HEIGHT;
+
+			tileClips[TILE_BOTTOMLEFT].x = 0;
+			tileClips[TILE_BOTTOMLEFT].y = 64;
+			tileClips[TILE_BOTTOMLEFT].w = TILE_WIDTH;
+			tileClips[TILE_BOTTOMLEFT].h = TILE_HEIGHT;
+	
+			tileClips[TILE_BOTTOM].x = 32;
+			tileClips[TILE_BOTTOM].y = 64;
+			tileClips[TILE_BOTTOM].w = TILE_WIDTH;
+			tileClips[TILE_BOTTOM].h = TILE_HEIGHT;
+
+			tileClips[TILE_BOTTOMRIGHT].x = 64;
+			tileClips[TILE_BOTTOMRIGHT].y = 64;
+			tileClips[TILE_BOTTOMRIGHT].w = TILE_WIDTH;
+			tileClips[TILE_BOTTOMRIGHT].h = TILE_HEIGHT;
+
+
+
+		}
+	}
+	map.close();
+
+	return tilesLoaded;
+}
+
+
+bool loadMedia(Tile* tiles[] = NULL) {
 	bool success = true;
 	
 	playerTexture.loadFromFile("../assets/link.png");
 
 	tileTexture.loadFromFile("../assets/tile.png");
+
+	tilesetTexture.loadFromFile("../assets/tileset.png");
 
 	if (!playerSheetTexture.loadFromFile("../assets/coin2.png")){
 		printf("Failed to load texture image!!\n");
@@ -167,22 +268,23 @@ bool loadMedia() {
 		success = false;
 	}
 
+	if (!setTiles(tiles)){
+		printf("failed to load tiles");
+		success = false;
+	}
 
 	return success;
 }
-
 
 int main(int argc, char ** argv){
 	init();
 	bool quit = false;
 	SDL_Event e;
-	loadMedia();
-	Sprite player(300,200,&playerTexture);
+	
+	Tile* tileSet[TOTAL_TILES];
+	if(!loadMedia(tileSet))printf("couldnt load tileset!");
+	Sprite player(300,300,&playerTexture);
 	int scrollingOffset = 0;
-	std::vector<Sprite*> tiles(10);
-	for (int i = 0; i < 10; ++i){
-		tiles[i] = new Sprite((i+10)*32,300,&tileTexture);
-	}
 	Sprite background(0,0,&backgroundTexture);
 	SDL_Rect camera = {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 	while (!quit){
@@ -192,29 +294,20 @@ int main(int argc, char ** argv){
 			}
 			player.handleEvent(e);
 		}	
-		player.move(tiles);
-		camera.x = (player.mPosX + player.spriteTexture->getWidth()/2) - SCREEN_WIDTH/2;
-		camera.y = (player.mPosY + player.spriteTexture->getHeight()/2) - SCREEN_HEIGHT/2;
-		if (camera.x < 0)camera.x = 0;
-		if (camera.y < 0)camera.y = 0;
-		if (camera.x > LEVEL_WIDTH - camera.w)camera.x = LEVEL_WIDTH - camera.w;
-		if (camera.y > LEVEL_HEIGHT - camera.h)camera.y = LEVEL_HEIGHT - camera.h;
+		player.move(tileSet);
+		player.setCamera(camera);
 		SDL_SetRenderDrawColor(gRenderer,0xff,0xff,0xff,0xff);
 		SDL_RenderClear(gRenderer);
-		background.render(camera.x,camera.y);
+		//background.render(camera.x,camera.y);
 		SDL_SetRenderDrawColor(gRenderer,0,0,0,0xff);
-		for (int i = 0; i < 10; ++i){
-			tiles[i]->render(camera.x,camera.y);
-			//SDL_RenderDrawRect(gRenderer, &tiles[i]->mCollider);
+		for (int i = 0; i < TOTAL_TILES; ++i){
+			tileSet[i]->render(camera);
 		}
 		player.render(camera.x,camera.y);
 		SDL_Rect shadow = player.mCollider;
 		shadow.x -= camera.x;
 		shadow.y -= camera.y;
 		SDL_RenderDrawRect(gRenderer,&shadow);
-		//tile.render(camera.x,camera.y);
-		//printf("[%d,%d]\n",player.mPosX,player.mPosY);
-		//printf("[%d,%d]\n",camera.x,camera.y);
 		SDL_RenderPresent(gRenderer);
 	}
 	close();

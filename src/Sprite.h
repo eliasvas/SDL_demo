@@ -27,6 +27,7 @@ namespace engine{
 	public:
 		static const int SPRITE_VEL = 5;
 		Sprite(int x,int y,Texture* texture);
+		Sprite(int x,int y,Texture* texture, int frames, int frameDelay);
 		Sprite();
 		Sprite(int x,int y,Texture* texture,SDL_Rect& col);
 		void handleEvent(SDL_Event& e);
@@ -34,34 +35,68 @@ namespace engine{
 		void move(std::vector<Sprite*> tiles);
 		void move(Tile* tiles[]);
 		void setCamera(SDL_Rect& camera);
-		void render(int camX,int camY);
+		void render(SDL_Rect& camera);
+		void animate();
 
 
-		int mPosX, mPosY;
+		SDL_Rect srcRect, dstRect;
 		int mVelX, mVelY;
 		Texture* spriteTexture;
 		SDL_Rect mCollider;
+		bool animated = false;
+		int frameDelay = 100;
+		int frames = 0;
 	};
 
 
 	Sprite::Sprite(int x,int y,Texture* texture){
-		mPosX = x;
-		mPosY = y;
+		dstRect.x = x;
+		dstRect.y = y;
+		dstRect.w = 32;
+		dstRect.h = 32;
+
+		srcRect.x = 0;
+		srcRect.y = 0;
+		srcRect.w = 32;
+		srcRect.h = 32;
 
 		mVelX = 0;
 		mVelY = 0;
 
-		mCollider.x = mPosX;
-		mCollider.y = mPosY;
+		mCollider.x = dstRect.x;
+		mCollider.y = dstRect.y;
 		mCollider.w = texture->getWidth();
 		mCollider.h = texture->getHeight();
 
 		spriteTexture = texture;
 	}
 
+	Sprite::Sprite(int x,int y,Texture* texture, int frames, int frameDelay){
+		dstRect.x = x;
+		dstRect.y = y;
+		dstRect.w = 32;
+		dstRect.h = 32;
+
+		mVelX = 0;
+		mVelY = 0;
+
+		mCollider.x = dstRect.x;
+		mCollider.y = dstRect.y;
+		mCollider.w = texture->getWidth();
+		mCollider.h = texture->getHeight();
+
+		spriteTexture = texture;
+
+		animated = true;
+		this->frameDelay = frameDelay;
+		this->frames = frames;
+	}
+
 	Sprite::Sprite(int x,int y,Texture* texture, SDL_Rect& col){
-		mPosX = x;
-		mPosY = y;
+		dstRect.x = x;
+		dstRect.y = y;
+		dstRect.w = 32;
+		dstRect.h = 32;
 
 		mVelX = 0;
 		mVelY = 0;
@@ -104,51 +139,63 @@ namespace engine{
 	}
 
 	void Sprite::move(std::vector<Sprite*> tiles){
-		mPosX += mVelX;
-		mCollider.x = mPosX;
-		if((mPosX < 0)||(mPosX + spriteTexture->getWidth()> LEVEL_WIDTH)|| (checkCollision(mCollider,tiles))){
-			mPosX -= mVelX;
-			mCollider.x = mPosX;
+		dstRect.x += mVelX;
+		mCollider.x = dstRect.x;
+		if((dstRect.x < 0)||(dstRect.x + spriteTexture->getWidth()> LEVEL_WIDTH)|| (checkCollision(mCollider,tiles))){
+			dstRect.x -= mVelX;
+			mCollider.x = dstRect.x;
 		}
-		mPosY += mVelY;
-		mCollider.y = mPosY;
-		if((mPosY < 0)||(mPosY + spriteTexture->getHeight()> LEVEL_HEIGHT)||(checkCollision(mCollider,tiles))){
-			mPosY -= mVelY;
-			mCollider.y = mPosY;
+		dstRect.y += mVelY;
+		mCollider.y = dstRect.y;
+		if((dstRect.y < 0)||(dstRect.y + spriteTexture->getHeight()> LEVEL_HEIGHT)||(checkCollision(mCollider,tiles))){
+			dstRect.y -= mVelY;
+			mCollider.y = dstRect.y;
 		}
 
 	}
 
 
 	void Sprite::move(Tile* tiles[]){
-		mPosX += mVelX;
-		mCollider.x = mPosX;
-		if((mPosX < 0)||(mPosX + spriteTexture->getWidth()> LEVEL_WIDTH)|| (touchesWall(mCollider,tiles))){
-			mPosX -= mVelX;
-			mCollider.x = mPosX;
+		animate();
+		dstRect.x += mVelX;
+		mCollider.x = dstRect.x;
+		if((dstRect.x < 0)||(dstRect.x + spriteTexture->getWidth()> LEVEL_WIDTH)|| (touchesWall(mCollider,tiles))){
+			dstRect.x -= mVelX;
+			mCollider.x = dstRect.x;
 		}
-		mPosY += mVelY;
-		mCollider.y = mPosY;
-		if((mPosY < 0)||(mPosY + spriteTexture->getHeight()> LEVEL_HEIGHT)||(touchesWall(mCollider,tiles))){
-			mPosY -= mVelY;
-			mCollider.y = mPosY;
+		dstRect.y += mVelY;
+		mCollider.y = dstRect.y;
+		if((dstRect.y < 0)||(dstRect.y + spriteTexture->getHeight()> LEVEL_HEIGHT)||(touchesWall(mCollider,tiles))){
+			dstRect.y -= mVelY;
+			mCollider.y = dstRect.y;
 		}
 
 	}
 
 
-	void Sprite::render(int camX,int camY){
-		spriteTexture->render(mPosX-camX,mPosY-camY);	
+	void Sprite::render(SDL_Rect& camera){
+		dstRect.x -= camera.x;
+		dstRect.y -= camera.y;
+		spriteTexture->render(&srcRect,&dstRect);
+		dstRect.x += camera.x;
+		dstRect.y += camera.y;	
 	}
 
 	void Sprite::setCamera( SDL_Rect& camera )
 	{
-		camera.x = (mPosX + spriteTexture->getWidth()/2) - SCREEN_WIDTH/2;
-		camera.y = (mPosY + spriteTexture->getHeight()/2) - SCREEN_HEIGHT/2;
+		camera.x = (dstRect.x + spriteTexture->getWidth()/2) - SCREEN_WIDTH/2;
+		camera.y = (dstRect.y + spriteTexture->getHeight()/2) - SCREEN_HEIGHT/2;
 		if (camera.x < 0)camera.x = 0;
 		if (camera.y < 0)camera.y = 0;
 		if (camera.x > LEVEL_WIDTH - camera.w)camera.x = LEVEL_WIDTH - camera.w;
 		if (camera.y > LEVEL_HEIGHT - camera.h)camera.y = LEVEL_HEIGHT - camera.h;
+	}
+
+	void Sprite::animate(){
+		if (animated){
+			//animate
+			printf("ani");
+		}
 	}
 
 }

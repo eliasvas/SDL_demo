@@ -303,7 +303,7 @@ int main(int argc, char ** argv){
 		for (int i = 0; i < TOTAL_TILES; ++i){
 			tileSet[i]->render(camera);
 		}
-		player.render(camera.x,camera.y);
+		player.render(camera);
 		SDL_Rect shadow = player.mCollider;
 		shadow.x -= camera.x;
 		shadow.y -= camera.y;

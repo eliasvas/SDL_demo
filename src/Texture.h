@@ -22,6 +22,8 @@ namespace engine{
 		
 		void render(int x,int y, SDL_Rect *clip = NULL, double angle= 0.0,SDL_Point* center = NULL,SDL_RendererFlip flip = SDL_FLIP_NONE);
 
+		void render(SDL_Rect* srcRect, SDL_Rect* dstRect);
+
 		void setColor(uint8_t red, uint8_t green, uint8_t blue);
 
 		void setAlpha(uint8_t alpha);
@@ -120,6 +122,9 @@ namespace engine{
 
 		SDL_RenderCopyEx(gRenderer, mTexture,clip, &renderQuad,angle,center,flip);
 	}
-
+	
+	void Texture::render(SDL_Rect* srcRect, SDL_Rect* dstRect){
+		SDL_RenderCopy(gRenderer, mTexture, srcRect, dstRect);
+	}
 }
 

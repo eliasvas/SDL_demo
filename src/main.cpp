@@ -203,7 +203,7 @@ bool setTiles(Tile *tiles[] = NULL){
 bool loadMedia(Tile* tiles[] = NULL) {
 	bool success = true;
 	
-	playerTexture.loadFromFile("../assets/link.png");
+	playerTexture.loadFromFile("../assets/link-spritesheet.png");
 
 	tileTexture.loadFromFile("../assets/tile.png");
 
@@ -283,7 +283,7 @@ int main(int argc, char ** argv){
 	
 	Tile* tileSet[TOTAL_TILES];
 	if(!loadMedia(tileSet))printf("couldnt load tileset!");
-	Sprite player(300,300,&playerTexture);
+	Sprite player(300,300,&playerTexture, 2, 100);
 	int scrollingOffset = 0;
 	Sprite background(0,0,&backgroundTexture);
 	SDL_Rect camera = {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};

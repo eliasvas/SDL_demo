@@ -77,12 +77,18 @@ namespace engine{
 		dstRect.w = 32;
 		dstRect.h = 32;
 
+
+		srcRect.x = texture->getWidth() / frames;
+		srcRect.y = 0;
+		srcRect.w = texture->getWidth() / frames;
+		srcRect.h = texture->getHeight();
+
 		mVelX = 0;
 		mVelY = 0;
 
 		mCollider.x = dstRect.x;
 		mCollider.y = dstRect.y;
-		mCollider.w = texture->getWidth();
+		mCollider.w = texture->getWidth() / frames;
 		mCollider.h = texture->getHeight();
 
 		spriteTexture = texture;
@@ -193,8 +199,7 @@ namespace engine{
 
 	void Sprite::animate(){
 		if (animated){
-			//animate
-			printf("ani");
+			srcRect.x = srcRect.w * ((int)(SDL_GetTicks()/frameDelay) % frames);
 		}
 	}
 

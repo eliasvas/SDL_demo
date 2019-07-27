@@ -283,7 +283,7 @@ int main(int argc, char ** argv){
 	
 	Tile* tileSet[TOTAL_TILES];
 	if(!loadMedia(tileSet))printf("couldnt load tileset!");
-	Sprite player(300,300,&playerTexture, 2, 100);
+	Sprite player(300,300,&playerTexture, 2,2, 1000);
 	int scrollingOffset = 0;
 	Sprite background(0,0,&backgroundTexture);
 	SDL_Rect camera = {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};

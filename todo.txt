@@ -1,3 +1,4 @@
 - make animation loading for 2D array of tiles
 - add menus
 - fix collision detection and movement behaviour
+- colliding with sprites

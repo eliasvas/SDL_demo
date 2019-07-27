@@ -13,7 +13,7 @@ using namespace engine;
 
 bool touchesWall(SDL_Rect box, Tile* tiles[]){
 	for (int i = 0; i < TOTAL_TILES;++i){
-		if (tiles[i]->mType == 0 || tiles[i]->mType == 1){
+		if (tiles[i]->solid){
 			if (checkCollision(box, tiles[i]->mCollider)){
 				return true;
 			}
@@ -28,15 +28,17 @@ namespace engine{
 		static const int SPRITE_VEL = 5;
 		Sprite(int x,int y,Texture* texture);
 		Sprite(int x,int y,Texture* texture, int frames, int frameDelay);
+		Sprite(int x,int y,Texture* texture, int frames,int numOfAnimations, int frameDelay);
 		Sprite();
 		Sprite(int x,int y,Texture* texture,SDL_Rect& col);
 		void handleEvent(SDL_Event& e);
-		//void move();
 		void move(std::vector<Sprite*> tiles);
+		void move(std::vector<SDL_Rect*> col);
 		void move(Tile* tiles[]);
 		void setCamera(SDL_Rect& camera);
 		void render(SDL_Rect& camera);
 		void animate();
+		void changeToAnimationNum(int num);
 
 
 		SDL_Rect srcRect, dstRect;
@@ -46,6 +48,8 @@ namespace engine{
 		bool animated = false;
 		int frameDelay = 100;
 		int frames = 0;
+		int numberOfAnimations = 0;
+		int currentNumOfAnimation = 0;
 	};
 
 
@@ -75,6 +79,35 @@ namespace engine{
 		mCollider.h = texture->getHeight();
 
 		spriteTexture = texture;
+	}
+	Sprite::Sprite(int x,int y,Texture* texture, int frames,int numOfAnimations, int frameDelay){
+		assert(numOfAnimations > 0);
+		dstRect.x = x;
+		dstRect.y = y;
+		dstRect.w = 32;
+		dstRect.h = 32;
+
+
+		srcRect.x = texture->getWidth() / frames;
+		srcRect.y = 0;
+		srcRect.w = texture->getWidth() / frames;
+		srcRect.h = texture->getHeight() / numOfAnimations; //@Check
+
+		mVelX = 0;
+		mVelY = 0;
+
+		mCollider.x = dstRect.x;
+		mCollider.y = dstRect.y;
+		mCollider.w = texture->getWidth() / frames;
+		mCollider.h = texture->getHeight() / numOfAnimations;
+
+		spriteTexture = texture;
+
+		animated = true;
+		this->frameDelay = frameDelay;
+		this->frames = frames;
+		numberOfAnimations = numOfAnimations;
+
 	}
 
 	Sprite::Sprite(int x,int y,Texture* texture, int frames, int frameDelay){
@@ -138,6 +171,7 @@ namespace engine{
 				case SDLK_DOWN: mVelY += SPRITE_VEL;break;
 				case SDLK_LEFT: mVelX -= SPRITE_VEL;break;
 				case SDLK_RIGHT: mVelX += SPRITE_VEL;break;
+				case SDLK_e: changeToAnimationNum(1);break;
 			}
 		}else if (e.type == SDL_KEYUP && e.key.repeat == 0){
 			switch(e.key.keysym.sym){
@@ -145,8 +179,16 @@ namespace engine{
 				case SDLK_DOWN: mVelY -= SPRITE_VEL;break;
 				case SDLK_LEFT: mVelX += SPRITE_VEL;break;
 				case SDLK_RIGHT: mVelX -= SPRITE_VEL;break;
+				case SDLK_e: changeToAnimationNum(0);break;
 			}
 		}
+	}
+
+	bool checkCollision (SDL_Rect& mCollider,std::vector<SDL_Rect*> col){
+		for (int i = 0; i < col.size(); ++i){
+			if (checkCollision(mCollider, *col[i]))return true;
+		}
+		return false;
 	}
 
 	bool checkCollision (SDL_Rect& mCollider,std::vector<Sprite*> tiles){
@@ -154,6 +196,22 @@ namespace engine{
 			if (checkCollision(mCollider, tiles[i]->mCollider))return true;
 		}
 		return false;
+	}
+
+	void Sprite::move(std::vector<SDL_Rect*> col){
+		dstRect.x += mVelX;
+		mCollider.x = dstRect.x;
+		if((dstRect.x < 0)||(dstRect.x + spriteTexture->getWidth()> LEVEL_WIDTH)|| (checkCollision(mCollider,col))){
+			dstRect.x -= mVelX;
+			mCollider.x = dstRect.x;
+		}
+		dstRect.y += mVelY;
+		mCollider.y = dstRect.y;
+		if((dstRect.y < 0)||(dstRect.y + spriteTexture->getHeight()> LEVEL_HEIGHT)||(checkCollision(mCollider,col))){
+			dstRect.y -= mVelY;
+			mCollider.y = dstRect.y;
+		}
+
 	}
 
 	void Sprite::move(std::vector<Sprite*> tiles){
@@ -209,11 +267,18 @@ namespace engine{
 		if (camera.y > LEVEL_HEIGHT - camera.h)camera.y = LEVEL_HEIGHT - camera.h;
 	}
 
+	//@WARNING: This type of animation displays fixed frames per milisecond (%)
 	void Sprite::animate(){
 		if (animated){
 			srcRect.x = srcRect.w * ((int)(SDL_GetTicks()/frameDelay) % frames);
 		}
 	}
 
+	void Sprite::changeToAnimationNum(int num){
+		if (num > numberOfAnimations-1)num = 0; //TODO cancel current
+		if (num == currentNumOfAnimation || numberOfAnimations == 0)return;
+		srcRect.y = (srcRect.h)* num;
+		currentNumOfAnimation = num;
+	}
 }
 

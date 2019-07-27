@@ -29,6 +29,7 @@ namespace engine{
 		int mPosX, mPosY;
 		SDL_Rect mCollider;
 		int mType;
+		bool solid = false; //should be more like passing pointer to TOP along with other GOs
 	};
 
 
@@ -41,6 +42,7 @@ namespace engine{
 		mCollider.w = texture->getWidth();
 		mCollider.h = texture->getHeight();
 
+		if (mType == 0 || mType == 1)solid = true;
 	}
 
 	Tile::Tile(int x,int y,int type){
@@ -49,11 +51,12 @@ namespace engine{
 
 		mCollider.x = mPosX;
 		mCollider.y = mPosY;
-		mCollider.w = TILE_WIDTH;
-		mCollider.h = TILE_HEIGHT;
+		mCollider.w = TILE_WIDTH - 2;
+		mCollider.h = TILE_HEIGHT - 2;
 
 		
 		mType = type;
+		if (mType == 0 || mType == 1)solid = true;
 	}
 
 
@@ -64,7 +67,6 @@ namespace engine{
 		if (checkCollision(camera,mCollider))
 			tilesetTexture.render(mPosX-camera.x,mPosY-camera.y, &tileClips[mType]);	
 	}
-
 
 
 }

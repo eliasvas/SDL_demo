@@ -4,6 +4,7 @@
 #include <SDL_mixer.h>
 #include <stdio.h>
 #include <string>
+#include <assert.h>
 #pragma once
 
 namespace engine{

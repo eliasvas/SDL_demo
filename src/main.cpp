@@ -12,6 +12,7 @@
 #include <Sprite.h>
 #include <util.h>
 #include <Tile.h>
+#include <Entity.h>
 
 
 using namespace engine;

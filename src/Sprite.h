@@ -55,7 +55,7 @@ namespace engine{
 		int frames = 0;
 		int numberOfAnimations = 0;
 		int currentNumOfAnimation = 0;
-		int currentFrame = 0;
+		int currentFrame = 0; //NOTE:  noone change this, if put to 0 restarts current anim
 	};
 
 
@@ -206,6 +206,7 @@ namespace engine{
 	}
 
 	void Sprite::move(std::vector<SDL_Rect*> col){
+		physicallyAnimate();
 		dstRect.x += mVelX;
 		mCollider.x = dstRect.x;
 		if((dstRect.x < 0)||(dstRect.x + spriteTexture->getWidth()> LEVEL_WIDTH)|| (checkCollision(mCollider,col))){
@@ -222,6 +223,7 @@ namespace engine{
 	}
 
 	void Sprite::move(std::vector<Sprite*> tiles){
+		physicallyAnimate();
 		dstRect.x += mVelX;
 		mCollider.x = dstRect.x;
 		if((dstRect.x < 0)||(dstRect.x + spriteTexture->getWidth()> LEVEL_WIDTH)|| (checkCollision(mCollider,tiles))){

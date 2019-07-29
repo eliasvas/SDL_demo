@@ -8,6 +8,13 @@
 #pragma once
 
 namespace engine{
+	
+	const int FPS = 60;
+	int frameDelay = 1000/FPS; //max time between frames meaning 1 second per FPS=60
+	uint32_t frameStart;
+	int frameTime;
+	
+
 	const int SCREEN_WIDTH = 800;
 	const int SCREEN_HEIGHT = 600;
 

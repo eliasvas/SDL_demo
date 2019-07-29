@@ -38,18 +38,24 @@ namespace engine{
 		void setCamera(SDL_Rect& camera);
 		void render(SDL_Rect& camera);
 		void animate();
+		void physicallyAnimate(int delayModifier = 16);
 		void changeToAnimationNum(int num);
+		void changeToFrame(int frame);
 
 
 		SDL_Rect srcRect, dstRect;
 		int mVelX, mVelY;
 		Texture* spriteTexture;
 		SDL_Rect mCollider;
+
+
+		//animatior component
 		bool animated = false;
 		int frameDelay = 100;
 		int frames = 0;
 		int numberOfAnimations = 0;
 		int currentNumOfAnimation = 0;
+		int currentFrame = 0;
 	};
 
 
@@ -172,6 +178,7 @@ namespace engine{
 				case SDLK_LEFT: mVelX -= SPRITE_VEL;break;
 				case SDLK_RIGHT: mVelX += SPRITE_VEL;break;
 				case SDLK_e: changeToAnimationNum(1);break;
+				case SDLK_q: changeToFrame(1);break;
 			}
 		}else if (e.type == SDL_KEYUP && e.key.repeat == 0){
 			switch(e.key.keysym.sym){
@@ -232,7 +239,7 @@ namespace engine{
 
 
 	void Sprite::move(Tile* tiles[]){
-		animate();
+		physicallyAnimate();
 		dstRect.x += mVelX;
 		mCollider.x = dstRect.x;
 		if((dstRect.x < 0)||(dstRect.x + spriteTexture->getWidth()> LEVEL_WIDTH)|| (touchesWall(mCollider,tiles))){
@@ -268,17 +275,32 @@ namespace engine{
 	}
 
 	//@WARNING: This type of animation displays fixed frames per milisecond (%)
+	//this works if we want our animations to continue to their previous framecounts when changing!!!
 	void Sprite::animate(){
 		if (animated){
 			srcRect.x = srcRect.w * ((int)(SDL_GetTicks()/frameDelay) % frames);
 		}
 	}
 
+	void Sprite::physicallyAnimate(int delayModifier){
+		if (!animated)return;
+		assert(delayModifier > 0);
+		++currentFrame;
+		if (currentFrame/frames >= (frames*delayModifier))currentFrame=0;
+		changeToFrame(currentFrame/(frames*delayModifier));		
+	}
+
 	void Sprite::changeToAnimationNum(int num){
+		currentFrame = 0; //restarting animations
 		if (num > numberOfAnimations-1)num = 0; //TODO cancel current
 		if (num == currentNumOfAnimation || numberOfAnimations == 0)return;
 		srcRect.y = (srcRect.h)* num;
 		currentNumOfAnimation = num;
+	}
+	void Sprite::changeToFrame(int frame){
+		if (frames == 0)return;
+		if (frame > frames-1)frame = 0; //TODO cancel current
+		srcRect.x = (srcRect.w)* frame;
 	}
 }
 

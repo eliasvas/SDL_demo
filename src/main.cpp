@@ -39,7 +39,7 @@ bool init(){
 		printf("Window could not be created!! SDL Error: %s\n", SDL_GetError());
 		success = false;
 	}else {
-		gRenderer  = SDL_CreateRenderer(gWindow,-1,SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
+		gRenderer  = SDL_CreateRenderer(gWindow,-1,SDL_RENDERER_ACCELERATED);
 
 		if (gRenderer == NULL){
 			printf("Renderer could not be created!! SDL Error: %s\n",SDL_GetError());
@@ -288,12 +288,15 @@ int main(int argc, char ** argv){
 	Sprite background(0,0,&backgroundTexture);
 	SDL_Rect camera = {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 	while (!quit){
+		frameStart = SDL_GetTicks();
+		
 		while (SDL_PollEvent(&e)!=0){
 			if (e.type == SDL_QUIT){
 				quit = true;
 			}
 			player.handleEvent(e);
 		}	
+
 		player.move(tileSet);
 		player.setCamera(camera);
 		SDL_SetRenderDrawColor(gRenderer,0xff,0xff,0xff,0xff);
@@ -309,6 +312,9 @@ int main(int argc, char ** argv){
 		shadow.y -= camera.y;
 		SDL_RenderDrawRect(gRenderer,&shadow);
 		SDL_RenderPresent(gRenderer);
+
+		frameTime = SDL_GetTicks() - frameStart;
+		if (frameDelay > frameTime)SDL_Delay(frameDelay-frameTime);
 	}
 	close();
 }

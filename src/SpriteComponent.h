@@ -13,7 +13,6 @@ namespace engine{
 
 		SpriteComponent(int x,int y,SDL_Rect* lCamera,Texture* lTexture){
 			texture = lTexture;
-			//printf("%d %d ", lTexture->mWidth,lTexture->mHeight);
 			dstRect.x = x;
 			dstRect.y = y;
 			dstRect.w = 32;
@@ -27,14 +26,13 @@ namespace engine{
 
 			srcRect.x = 0;
 			srcRect.y = 0;
-			srcRect.w = 32;//mTexture->getWidth();
-			srcRect.h = 32;//mTexture->getHeight();
+			srcRect.w = lTexture->getWidth();
+			srcRect.h = lTexture->getHeight();
 
 			camera = lCamera;
 		}
 		void update(){
 			//srcRect.x++;
-			
 		}
 		void renderr(SDL_Rect camera){
 			dstRect.x -= camera.x;

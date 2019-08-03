@@ -11,11 +11,13 @@ struct AnimatorComponent : public Component{
 	int currentFrame = 0; //NOTE:  noone change this, if put to 0 restarts current anim
 	SpriteComponent* sprite;
 
-	AnimatorComponent(int frames, int numberOfAnimations) {
-		printf("..");
-		//if (!entity->hasComponent<SpriteComponent>())
-		//	sprite = (SpriteComponent*)entity->getComponent<SpriteComponent>();
+
+	AnimatorComponent(int frames, int numberOfAnimations,Entity* e) {
+		entity = e;
+		if (!entity->hasComponent<SpriteComponent>())
+			sprite = (SpriteComponent*)entity->getComponent<SpriteComponent>();
 	}
+
 	void animate(){
 		if (animated){
 			sprite->srcRect.x = sprite->srcRect.w * ((int)(SDL_GetTicks()/frameDelay) % frames);

@@ -26,6 +26,7 @@ namespace engine {
 
 	class Entity{
 	public:
+		int foo = 10;
 		bool active = true;
 		std::vector<Component*> components;  //maybe unique_ptr<>, will see.
 		bool isActive(){return active;}
@@ -44,10 +45,13 @@ namespace engine {
 			}
 			return NULL;
 		}
-		template <typename T, typename... TArgs> T& addComponent(TArgs&&... mArgs){
-			Component* cmp = new T(std::forward<TArgs>(mArgs)...);
+		template <typename T, typename... TArgs> 
+		T& addComponent(TArgs&&... mArgs){
+			T* cmp = new T(std::forward<TArgs>(mArgs)...);
 			cmp->entity = this;
-			components.push_back((Component*)cmp);
+			components.push_back(cmp);
+			cmp->init();
+			return *cmp;
 		}
 		virtual void init(){}
 		virtual void update(){

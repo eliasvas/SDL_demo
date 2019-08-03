@@ -12,7 +12,6 @@
 #include <Sprite.h>
 #include <util.h>
 #include <Tile.h>
-#include <Entity.h>
 #include <ECS.h>
 #include <SpriteComponent.h>
 #include <AnimatorComponent.h>
@@ -294,8 +293,8 @@ int main(int argc, char ** argv){
 
 	Entity *p = manager.addEntity();
 	p->addComponent<SpriteComponent>(200,300, &camera, &tileTexture);
-	p->addComponent<AnimatorComponent>(2,2);
-	printf("%d", p->getComponent<AnimatorComponent>());
+	p->addComponent<AnimatorComponent>(2,2, p);
+	//printf("%d", p->getComponent<AnimatorComponent>()->entity->foo);
 	Sprite player(300,300,&playerTexture, 2,2, 1000);
 	int scrollingOffset = 0;
 	Sprite background(0,0,&backgroundTexture);

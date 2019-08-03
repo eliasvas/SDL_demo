@@ -31,8 +31,7 @@ namespace engine{
 		int getWidth();
 		int getHeight();
 
-	private:
-		SDL_Texture* mTexture;
+		SDL_Texture* mTexture;  //change to private
 
 		int mWidth;
 		int mHeight;

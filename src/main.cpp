@@ -13,6 +13,9 @@
 #include <util.h>
 #include <Tile.h>
 #include <Entity.h>
+#include <ECS.h>
+#include <SpriteComponent.h>
+#include <AnimatorComponent.h>
 
 
 using namespace engine;
@@ -206,7 +209,8 @@ bool loadMedia(Tile* tiles[] = NULL) {
 	
 	playerTexture.loadFromFile("../assets/link-spritesheet.png");
 
-	tileTexture.loadFromFile("../assets/tile.png");
+	tileTexture.loadFromFile("../assets/link.png");
+	//printf("%d, %d\n", tileTexture.mWidth, tileTexture.mHeight);
 
 	tilesetTexture.loadFromFile("../assets/tileset.png");
 
@@ -276,18 +280,25 @@ bool loadMedia(Tile* tiles[] = NULL) {
 
 	return success;
 }
+EntityManager manager;
 
 int main(int argc, char ** argv){
 	init();
 	bool quit = false;
 	SDL_Event e;
-	
+	SDL_Rect camera = {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
+
+
 	Tile* tileSet[TOTAL_TILES];
 	if(!loadMedia(tileSet))printf("couldnt load tileset!");
+
+	Entity *p = manager.addEntity();
+	p->addComponent<SpriteComponent>(200,300, &camera, &tileTexture);
+	p->addComponent<AnimatorComponent>(2,2);
+	printf("%d", p->getComponent<AnimatorComponent>());
 	Sprite player(300,300,&playerTexture, 2,2, 1000);
 	int scrollingOffset = 0;
 	Sprite background(0,0,&backgroundTexture);
-	SDL_Rect camera = {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 	while (!quit){
 		frameStart = SDL_GetTicks();
 		
@@ -298,6 +309,7 @@ int main(int argc, char ** argv){
 			player.handleEvent(e);
 		}	
 
+		manager.update();
 		player.move(tileSet);
 		player.setCamera(camera);
 		SDL_SetRenderDrawColor(gRenderer,0xff,0xff,0xff,0xff);
@@ -308,6 +320,7 @@ int main(int argc, char ** argv){
 			tileSet[i]->render(camera);
 		}
 		player.render(camera);
+		manager.render();
 		SDL_Rect shadow = player.mCollider;
 		shadow.x -= camera.x;
 		shadow.y -= camera.y;

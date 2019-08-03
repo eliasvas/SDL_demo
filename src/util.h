@@ -9,6 +9,7 @@
 
 namespace engine{
 	
+	uint32_t componentCount = 0;
 	const int FPS = 60;
 	int frameDelay = 1000/FPS; //max time between frames meaning 1 second per FPS=60
 	uint32_t frameStart;

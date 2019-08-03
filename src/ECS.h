@@ -1,0 +1,103 @@
+#pragma once
+#include <util.h>
+#include <memory>
+#include <bitset>
+#include <array>
+#include <algorithm>
+#include <vector>
+#include <typeindex>
+#include <typeinfo>
+
+
+using namespace engine;
+
+namespace engine {
+	class Entity;
+	class Component{
+	public:
+		Entity* entity;
+
+		virtual void init(){}
+		virtual void update(){}
+		virtual void render(){}
+		
+		virtual ~Component(){}
+	};
+
+	class Entity{
+	public:
+		bool active = true;
+		std::vector<Component*> components;  //maybe unique_ptr<>, will see.
+		bool isActive(){return active;}
+		void destroy() {active = false;}
+		template <typename T>
+		bool hasComponent(){
+			for (int i = 0; i < components.size(); i++){
+				if (typeid(T) == typeid(*components[i]))return true;
+			}
+			return false;
+		}
+		template <typename T>
+		Component* getComponent(){
+			for (int i = 0; i < components.size(); i++){
+				if (typeid(T) == typeid(*components[i]))return components[i];
+			}
+			return NULL;
+		}
+		template <typename T, typename... TArgs> T& addComponent(TArgs&&... mArgs){
+			Component* cmp = new T(std::forward<TArgs>(mArgs)...);
+			cmp->entity = this;
+			components.push_back((Component*)cmp);
+		}
+		virtual void init(){}
+		virtual void update(){
+			for (int i = 0; i < components.size();++i){
+				components[i]->update();	
+			}
+		}
+		virtual void render(){
+			for (int i =0; i < components.size();++i){
+				components[i]->render();
+			}
+		}
+	};
+
+	struct EntityManager{
+		std::vector<Entity*> entities;
+		void update() {
+			for (auto& e : entities)e->update();
+		}
+		void render(){
+			for (auto& e: entities)e->render();
+		}
+		void refresh(){
+			for (int i = 0; i < entities.size(); ++i){
+				if (entities[i]->isActive() == false){
+					entities.erase(entities.begin() + i); //TODO check
+				}
+			}
+		}
+		Entity* addEntity() {
+			Entity *e = new Entity();
+			entities.push_back(e);
+			return e;
+		}
+	};
+
+	struct TransformmComponent: public Component{
+		TransformmComponent(int x, int y): x(x), y(y){}
+		int x;
+		int y;
+	};
+
+	struct TransformComponent: public Component{
+		TransformComponent(int x, int y): x(x), y(y){}
+		int x;
+		int y;
+	};
+
+}
+
+
+
+

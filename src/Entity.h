@@ -5,17 +5,17 @@
 using namespace engine;
 
 namespace engine{
-	struct Entity {
+	struct oldEntity {
 		SDL_Rect srcRect;
 		SDL_Rect dstRect;	
 		Texture* texture;
-		Entity(){}
-		Entity(int x, int y, Texture* Texture);
+		oldEntity(){}
+		oldEntity(int x, int y, Texture* Texture);
 		void render(SDL_Rect& camera);
 		void setCamera(SDL_Rect& camera);
 	};
 
-	Entity::Entity(int x,int y, Texture* texture){
+	oldEntity::oldEntity(int x,int y, Texture* texture){
 		dstRect.x = x;
 		dstRect.y = y;
 		dstRect.w = 32;
@@ -35,7 +35,7 @@ namespace engine{
 	
 	}
 
-	void Entity::render(SDL_Rect& camera){
+	void oldEntity::render(SDL_Rect& camera){
 		dstRect.x -= camera.x;
 		dstRect.y -= camera.y;
 		texture->render(&srcRect,&dstRect);
@@ -43,7 +43,7 @@ namespace engine{
 		dstRect.y += camera.y;	
 	}
 
-	void Entity::setCamera( SDL_Rect& camera )
+	void oldEntity::setCamera( SDL_Rect& camera )
 	{
 		camera.x = (dstRect.x + texture->getWidth()/2) - SCREEN_WIDTH/2;
 		camera.y = (dstRect.y + texture->getHeight()/2) - SCREEN_HEIGHT/2;

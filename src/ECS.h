@@ -9,7 +9,6 @@
 #include <typeinfo>
 
 
-using namespace engine;
 
 namespace engine {
 	class Entity;
@@ -72,6 +71,7 @@ namespace engine {
 			for (auto& e : entities)e->update();
 		}
 		void render(){
+			for (auto& e : entities)e->update();
 			for (auto& e: entities)e->render();
 		}
 		void refresh(){
@@ -80,6 +80,10 @@ namespace engine {
 					entities.erase(entities.begin() + i); //TODO check
 				}
 			}
+		}
+		Entity* addEntity(Entity* e) {
+			entities.push_back(e);
+			return e;
 		}
 		Entity* addEntity() {
 			Entity *e = new Entity();

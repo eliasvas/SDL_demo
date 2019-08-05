@@ -6,9 +6,12 @@
 #include <stdio.h>
 #include <string>
 #include <assert.h>
+#include <ECS.h>
+
 
 namespace engine{
 	
+	EntityManager manager;
 	uint32_t componentCount = 0;
 	const int FPS = 60;
 	int frameDelay = 1000/FPS; //max time between frames meaning 1 second per FPS=60
@@ -63,6 +66,15 @@ namespace engine{
 		return true;
 	}
 
+		void setCamera(SDL_Rect* camera, SDL_Rect* dstRect)
+		{
+			camera->x = (dstRect->x + 16) - SCREEN_WIDTH/2;
+			camera->y = (dstRect->y + 16) - SCREEN_HEIGHT/2;
+			if (camera->x < 0)camera->x = 0;
+			if (camera->y < 0)camera->y = 0;
+			if (camera->x > LEVEL_WIDTH - camera->w)camera->x = LEVEL_WIDTH - camera->w;
+			if (camera->y > LEVEL_HEIGHT - camera->h)camera->y = LEVEL_HEIGHT - camera->h;
+		}
 
 
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include <util.h>
 #include <ECS.h>
+#include <PositionComponent.h>
 
 using namespace engine;
 namespace engine{
@@ -9,12 +10,14 @@ namespace engine{
 		SDL_Rect dstRect;
 		SDL_Rect* camera;
 		Texture* texture;
+		PositionComponent* pos;
 
 
 		SpriteComponent(int x,int y,SDL_Rect* lCamera,Texture* lTexture){
 			texture = lTexture;
-			dstRect.x = x;
-			dstRect.y = y;
+			pos = new PositionComponent(x,y);
+			dstRect.x = 0;
+			dstRect.y = 0;
 			dstRect.w = 32;
 			dstRect.h = 32;
 
@@ -33,6 +36,9 @@ namespace engine{
 		}
 		void update(){
 			//srcRect.x++;
+			pos->update();
+			dstRect.x = pos->x;
+			dstRect.y = pos->y;
 		}
 		void renderr(SDL_Rect camera){
 			dstRect.x -= camera.x;

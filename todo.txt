@@ -7,3 +7,7 @@
 - colliding with sprites
 
 -scene graphs (@IMPORTANT)
+
+- add player (using all other components)
+
+-check collision detection system

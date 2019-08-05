@@ -15,7 +15,9 @@
 #include <ECS.h>
 #include <SpriteComponent.h>
 #include <AnimatorComponent.h>
-
+#include <ColliderComponent.h>
+#include <CollisionManager.h>
+#include <player.h>
 
 using namespace engine;
 SDL_Window *gWindow = NULL;
@@ -279,7 +281,6 @@ bool loadMedia(Tile* tiles[] = NULL) {
 
 	return success;
 }
-EntityManager manager;
 
 int main(int argc, char ** argv){
 	init();
@@ -291,12 +292,7 @@ int main(int argc, char ** argv){
 	Tile* tileSet[TOTAL_TILES];
 	if(!loadMedia(tileSet))printf("couldnt load tileset!");
 
-	Entity *p = manager.addEntity();
-	p->addComponent<SpriteComponent>(200,300, &camera, &tileTexture);
-	p->addComponent<AnimatorComponent>(2,2, p);
-	//printf("%d", p->getComponent<AnimatorComponent>()->entity->foo);
-	Sprite player(300,300,&playerTexture, 2,2, 1000);
-	int scrollingOffset = 0;
+	player p (200,300,&camera,&playerTexture,2,2);
 	Sprite background(0,0,&backgroundTexture);
 	while (!quit){
 		frameStart = SDL_GetTicks();
@@ -304,28 +300,28 @@ int main(int argc, char ** argv){
 		while (SDL_PollEvent(&e)!=0){
 			if (e.type == SDL_QUIT){
 				quit = true;
-			}
-			player.handleEvent(e);
-		}	
+			}else if (e.type == SDL_KEYDOWN && e.key.repeat == 0){
+				switch(e.key.keysym.sym){
+					case SDLK_q: p.animator->changeToFrame(1);break;
+					case SDLK_e: p.sprite->pos->x+=100;break;
 
+				}
+			}else if (e.type == SDL_KEYUP && e.key.repeat == 0){
+				switch(e.key.keysym.sym){
+					case SDLK_h: p.animator->changeToAnimationNum(0);break;
+					case SDLK_l: p.animator->changeToAnimationNum(0);break;
+				}
+			}
+
+		}	
 		manager.update();
-		player.move(tileSet);
-		player.setCamera(camera);
-		SDL_SetRenderDrawColor(gRenderer,0xff,0xff,0xff,0xff);
-		SDL_RenderClear(gRenderer);
-		//background.render(camera.x,camera.y);
+		setCamera(&camera, &p.sprite->dstRect);
 		SDL_SetRenderDrawColor(gRenderer,0,0,0,0xff);
 		for (int i = 0; i < TOTAL_TILES; ++i){
 			tileSet[i]->render(camera);
 		}
-		player.render(camera);
 		manager.render();
-		SDL_Rect shadow = player.mCollider;
-		shadow.x -= camera.x;
-		shadow.y -= camera.y;
-		SDL_RenderDrawRect(gRenderer,&shadow);
 		SDL_RenderPresent(gRenderer);
-
 		frameTime = SDL_GetTicks() - frameStart;
 		if (frameDelay > frameTime)SDL_Delay(frameDelay-frameTime);
 	}

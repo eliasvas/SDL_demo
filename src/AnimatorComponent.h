@@ -3,7 +3,7 @@
 #include <ECS.h>
 #include <SpriteComponent.h>
 struct AnimatorComponent : public Component{
-	bool animated = false;
+	bool animated = true;
 	int frameDelay = 100;
 	int frames = 0;
 	int numberOfAnimations = 0;
@@ -11,11 +11,25 @@ struct AnimatorComponent : public Component{
 	int currentFrame = 0; //NOTE:  noone change this, if put to 0 restarts current anim
 	SpriteComponent* sprite;
 
+	AnimatorComponent(int frames, int numberOfAnimations,SpriteComponent* s) {
+		this->frames = frames;
+		this->numberOfAnimations = numberOfAnimations;
+		sprite = s;
+		sprite->srcRect.w /= frames;
+		sprite->srcRect.h /= numberOfAnimations;
+		printf("%d", sprite->srcRect.w);
+
+	}
+
 
 	AnimatorComponent(int frames, int numberOfAnimations,Entity* e) {
+		this->frames = frames;
+		this->numberOfAnimations = numberOfAnimations;
 		entity = e;
-		if (!entity->hasComponent<SpriteComponent>())
-			sprite = (SpriteComponent*)entity->getComponent<SpriteComponent>();
+		sprite = (SpriteComponent*)entity->getComponent<SpriteComponent>();
+		sprite->srcRect.w /= frames;
+		sprite->srcRect.h /= numberOfAnimations;
+
 	}
 
 	void animate(){
@@ -43,6 +57,9 @@ struct AnimatorComponent : public Component{
 		if (frames == 0)return;
 		if (frame > frames-1)frame = 0; //TODO cancel current
 		sprite->srcRect.x = (sprite->srcRect.w)* frame;
+	}
+	void update(){
+		physicallyAnimate(10);	
 	}
 
 };

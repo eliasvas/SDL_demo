@@ -265,17 +265,6 @@ namespace engine{
 		dstRect.x += camera.x;
 		dstRect.y += camera.y;	
 	}
-
-	void Sprite::setCamera( SDL_Rect& camera )
-	{
-		camera.x = (dstRect.x + spriteTexture->getWidth()/2) - SCREEN_WIDTH/2;
-		camera.y = (dstRect.y + spriteTexture->getHeight()/2) - SCREEN_HEIGHT/2;
-		if (camera.x < 0)camera.x = 0;
-		if (camera.y < 0)camera.y = 0;
-		if (camera.x > LEVEL_WIDTH - camera.w)camera.x = LEVEL_WIDTH - camera.w;
-		if (camera.y > LEVEL_HEIGHT - camera.h)camera.y = LEVEL_HEIGHT - camera.h;
-	}
-
 	//@WARNING: This type of animation displays fixed frames per milisecond (%)
 	//this works if we want our animations to continue to their previous framecounts when changing!!!
 	void Sprite::animate(){
@@ -304,5 +293,6 @@ namespace engine{
 		if (frame > frames-1)frame = 0; //TODO cancel current
 		srcRect.x = (srcRect.w)* frame;
 	}
+	void Sprite::setCamera(SDL_Rect& camera){}
 }
 

@@ -109,6 +109,52 @@ SDL_Texture* loadTexture(std::string path) {
 
 
 bool setTiles(Tile *tiles[] = NULL){
+	//initializing tileCLips because later we have a deep copy
+	tileClips[TILE_TOPLEFT].x = 0;
+	tileClips[TILE_TOPLEFT].y = 0;
+	tileClips[TILE_TOPLEFT].w = TILE_WIDTH;
+	tileClips[TILE_TOPLEFT].h = TILE_HEIGHT;
+
+	tileClips[TILE_TOP].x = 32;
+	tileClips[TILE_TOP].y = 0;
+	tileClips[TILE_TOP].w = TILE_WIDTH;
+	tileClips[TILE_TOP].h = TILE_HEIGHT;
+
+	tileClips[TILE_TOPRIGHT].x = 64;
+	tileClips[TILE_TOPRIGHT].y = 0;
+	tileClips[TILE_TOPRIGHT].w = TILE_WIDTH;
+	tileClips[TILE_TOPRIGHT].h = TILE_HEIGHT;
+
+	tileClips[TILE_LEFT].x = 0;
+	tileClips[TILE_LEFT].y = 32;
+	tileClips[TILE_LEFT].w = TILE_WIDTH;
+	tileClips[TILE_LEFT].h = TILE_HEIGHT;
+
+	tileClips[TILE_CENTER].x = 32;
+	tileClips[TILE_CENTER].y = 32;
+	tileClips[TILE_CENTER].w = TILE_WIDTH;
+	tileClips[TILE_CENTER].h = TILE_HEIGHT;
+
+	tileClips[TILE_RIGHT].x = 64;
+	tileClips[TILE_RIGHT].y = 32;
+	tileClips[TILE_RIGHT].w = TILE_WIDTH;
+	tileClips[TILE_RIGHT].h = TILE_HEIGHT;
+
+	tileClips[TILE_BOTTOMLEFT].x = 0;
+	tileClips[TILE_BOTTOMLEFT].y = 64;
+	tileClips[TILE_BOTTOMLEFT].w = TILE_WIDTH;
+	tileClips[TILE_BOTTOMLEFT].h = TILE_HEIGHT;
+
+	tileClips[TILE_BOTTOM].x = 32;
+	tileClips[TILE_BOTTOM].y = 64;
+	tileClips[TILE_BOTTOM].w = TILE_WIDTH;
+	tileClips[TILE_BOTTOM].h = TILE_HEIGHT;
+
+	tileClips[TILE_BOTTOMRIGHT].x = 64;
+	tileClips[TILE_BOTTOMRIGHT].y = 64;
+	tileClips[TILE_BOTTOMRIGHT].w = TILE_WIDTH;
+	tileClips[TILE_BOTTOMRIGHT].h = TILE_HEIGHT;
+
 	bool tilesLoaded = true;
 	int x = 0;
 	int y = 0;
@@ -134,6 +180,14 @@ bool setTiles(Tile *tiles[] = NULL){
 			if ((tileType >= 0) && (tileType <TOTAL_TILE_SPRITES))
 			{
 				tiles[i] = new Tile(x,y,tileType);
+				/*Make an entity with a SpriteComponent which
+				 * takes as srcRect, meaning the SDL_Rect
+				 * that it is goin to draw a clip of the actual 
+				 * texture, which is denoted by tileClips[tileType]*/
+
+				Entity* newEntity = manager.addEntity();
+				SpriteComponent* s =&newEntity->addComponent<SpriteComponent>(x,y,&camera, &tilesetTexture, &tileClips[tileType]);
+				newEntity->addComponent<ColliderComponent>(s);
 			}else
 			{
 				printf("invalid tile type at %d\n",i);
@@ -148,57 +202,7 @@ bool setTiles(Tile *tiles[] = NULL){
 			}	
 			
 		}	
-		if (tilesLoaded)
-		{
-			tileClips[TILE_TOPLEFT].x = 0;
-			tileClips[TILE_TOPLEFT].y = 0;
-			tileClips[TILE_TOPLEFT].w = TILE_WIDTH;
-			tileClips[TILE_TOPLEFT].h = TILE_HEIGHT;
-
-			tileClips[TILE_TOP].x = 32;
-			tileClips[TILE_TOP].y = 0;
-			tileClips[TILE_TOP].w = TILE_WIDTH;
-			tileClips[TILE_TOP].h = TILE_HEIGHT;
-
-			tileClips[TILE_TOPRIGHT].x = 64;
-			tileClips[TILE_TOPRIGHT].y = 0;
-			tileClips[TILE_TOPRIGHT].w = TILE_WIDTH;
-			tileClips[TILE_TOPRIGHT].h = TILE_HEIGHT;
-
-			tileClips[TILE_LEFT].x = 0;
-			tileClips[TILE_LEFT].y = 32;
-			tileClips[TILE_LEFT].w = TILE_WIDTH;
-			tileClips[TILE_LEFT].h = TILE_HEIGHT;
-
-			tileClips[TILE_CENTER].x = 32;
-			tileClips[TILE_CENTER].y = 32;
-			tileClips[TILE_CENTER].w = TILE_WIDTH;
-			tileClips[TILE_CENTER].h = TILE_HEIGHT;
-
-			tileClips[TILE_RIGHT].x = 64;
-			tileClips[TILE_RIGHT].y = 32;
-			tileClips[TILE_RIGHT].w = TILE_WIDTH;
-			tileClips[TILE_RIGHT].h = TILE_HEIGHT;
-
-			tileClips[TILE_BOTTOMLEFT].x = 0;
-			tileClips[TILE_BOTTOMLEFT].y = 64;
-			tileClips[TILE_BOTTOMLEFT].w = TILE_WIDTH;
-			tileClips[TILE_BOTTOMLEFT].h = TILE_HEIGHT;
-	
-			tileClips[TILE_BOTTOM].x = 32;
-			tileClips[TILE_BOTTOM].y = 64;
-			tileClips[TILE_BOTTOM].w = TILE_WIDTH;
-			tileClips[TILE_BOTTOM].h = TILE_HEIGHT;
-
-			tileClips[TILE_BOTTOMRIGHT].x = 64;
-			tileClips[TILE_BOTTOMRIGHT].y = 64;
-			tileClips[TILE_BOTTOMRIGHT].w = TILE_WIDTH;
-			tileClips[TILE_BOTTOMRIGHT].h = TILE_HEIGHT;
-
-
-
-		}
-	}
+			}
 	map.close();
 
 	return tilesLoaded;
@@ -286,7 +290,6 @@ int main(int argc, char ** argv){
 	init();
 	bool quit = false;
 	SDL_Event e;
-	SDL_Rect camera = {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 
 
 	Tile* tileSet[TOTAL_TILES];

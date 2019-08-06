@@ -34,6 +34,28 @@ namespace engine{
 
 			camera = lCamera;
 		}
+		SpriteComponent(int x,int y,SDL_Rect* lCamera,Texture* lTexture, SDL_Rect* clip){
+			texture = lTexture;
+			pos = new PositionComponent(x,y);
+			dstRect.x = 0;
+			dstRect.y = 0;
+			dstRect.w = 32;
+			dstRect.h = 32;
+
+			srcRect.x = clip->x;
+			srcRect.y = clip->y;
+			srcRect.w = clip->w;
+			srcRect.h = clip->h;
+
+
+			srcRect.x = 0;
+			srcRect.y = 0;
+			srcRect.w = clip->w;
+			srcRect.h = clip->h;
+
+			camera = lCamera;
+		}
+
 		void update(){
 			//srcRect.x++;
 			pos->update();

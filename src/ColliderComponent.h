@@ -9,7 +9,7 @@ namespace engine{
 	struct ColliderComponent: public Component{
 		SDL_Rect col;
 		SpriteComponent* sprite;
-		bool drawablee = true;
+		bool drawable = true;
 		ColliderComponent(int x, int y, int width, int height){
 			col.x = x;
 			col.y = y;
@@ -32,7 +32,7 @@ namespace engine{
 			return CollisionManager::checkCollisionInTable(&col);
 		}
 		void render(){
-			if (sprite == NULL)return;
+			if (sprite == NULL || !drawable)return;
 			SDL_Rect renderRect = {sprite->dstRect.x - sprite->camera->x,sprite->dstRect.y - sprite->camera->y, col.w,col.h};
 			SDL_RenderDrawRect(gRenderer, &renderRect);
 		}

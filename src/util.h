@@ -42,6 +42,7 @@ namespace engine{
 	const int TILE_TOPLEFT = 0;
 
 
+	SDL_Rect camera = {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 	bool checkCollision(SDL_Rect& a, SDL_Rect& b){
 		int leftA,leftB;
 		int rightA, rightB;

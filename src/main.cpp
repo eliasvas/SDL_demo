@@ -293,7 +293,6 @@ int main(int argc, char ** argv){
 	if(!loadMedia(tileSet))printf("couldnt load tileset!");
 
 	player p (200,300,&camera,&playerTexture,2,2);
-	Sprite background(0,0,&backgroundTexture);
 	while (!quit){
 		frameStart = SDL_GetTicks();
 		
@@ -317,8 +316,10 @@ int main(int argc, char ** argv){
 		manager.update();
 		setCamera(&camera, &p.sprite->dstRect);
 		SDL_SetRenderDrawColor(gRenderer,0,0,0,0xff);
+		SDL_RenderClear(gRenderer);
+		SDL_SetRenderDrawColor(gRenderer,0xff,0,0,0xff);
 		for (int i = 0; i < TOTAL_TILES; ++i){
-			tileSet[i]->render(camera);
+			//tileSet[i]->render(camera);
 		}
 		manager.render();
 		SDL_RenderPresent(gRenderer);

@@ -32,9 +32,15 @@ namespace engine{
 			return CollisionManager::checkCollisionInTable(&col);
 		}
 		void render(){
-			if (sprite == NULL || !drawable)return;
-			SDL_Rect renderRect = {sprite->dstRect.x - sprite->camera->x,sprite->dstRect.y - sprite->camera->y, col.w,col.h};
-			SDL_RenderDrawRect(gRenderer, &renderRect);
+			if (!drawable)return;
+			SDL_Rect renderRect;
+			if (sprite == NULL ){
+				SDL_RenderDrawRect(gRenderer, &col);
+			}else {
+				SDL_Rect renderRect = {sprite->dstRect.x - sprite->camera->x,sprite->dstRect.y - sprite->camera->y, col.w,col.h};
+				SDL_RenderDrawRect(gRenderer, &renderRect);
+
+			}
 		}
 	};
 }

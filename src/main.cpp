@@ -176,18 +176,18 @@ bool setTiles(Tile *tiles[] = NULL){
 				tilesLoaded = false;
 				break;
 			}
-
 			if ((tileType >= 0) && (tileType <TOTAL_TILE_SPRITES))
 			{
-				tiles[i] = new Tile(x,y,tileType);
+				//tiles[i] = new Tile(x,y,tileType);
 				/*Make an entity with a SpriteComponent which
 				 * takes as srcRect, meaning the SDL_Rect
 				 * that it is goin to draw a clip of the actual 
 				 * texture, which is denoted by tileClips[tileType]*/
 
+				//gia na parei component prepei X=Y??????
 				Entity* newEntity = manager.addEntity();
-				SpriteComponent* s =&newEntity->addComponent<SpriteComponent>(x,y,&camera, &tilesetTexture, &tileClips[tileType]);
-				newEntity->addComponent<ColliderComponent>(s);
+				//SpriteComponent* s =&(newEntity->addComponent<SpriteComponent>(x,y,&camera, &tilesetTexture, &tileClips[tileType]));
+				newEntity->addComponent<ColliderComponent>(x,y,32,32);
 			}else
 			{
 				printf("invalid tile type at %d\n",i);
@@ -294,8 +294,9 @@ int main(int argc, char ** argv){
 
 	Tile* tileSet[TOTAL_TILES];
 	if(!loadMedia(tileSet))printf("couldnt load tileset!");
+	printf("%d\n", manager.entities.size());
+	player p (32,32,&camera,&playerTexture,2,2);
 
-	player p (200,300,&camera,&playerTexture,2,2);
 	while (!quit){
 		frameStart = SDL_GetTicks();
 		
@@ -305,7 +306,10 @@ int main(int argc, char ** argv){
 			}else if (e.type == SDL_KEYDOWN && e.key.repeat == 0){
 				switch(e.key.keysym.sym){
 					case SDLK_q: p.animator->changeToFrame(1);break;
-					case SDLK_e: p.sprite->pos->x+=100;break;
+					case SDLK_d: p.sprite->pos->x+=32;break;
+					case SDLK_w: p.sprite->pos->y-=32;break;
+					case SDLK_s: p.sprite->pos->y+=32;break;
+					case SDLK_a: p.sprite->pos->x-=32;break;
 
 				}
 			}else if (e.type == SDL_KEYUP && e.key.repeat == 0){

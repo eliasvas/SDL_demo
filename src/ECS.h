@@ -68,11 +68,15 @@ namespace engine {
 	struct EntityManager{
 		std::vector<Entity*> entities;
 		void update() {
-			for (auto& e : entities)e->update();
+			for(int i = 0; i < entities.size(); ++i){
+				entities[i]->update();
+			}
 		}
 		void render(){
-			for (auto& e : entities)e->update();
-			for (auto& e: entities)e->render();
+			for(int i = 0; i < entities.size(); ++i){
+				entities[i]->render();
+			}
+
 		}
 		void refresh(){
 			for (int i = 0; i < entities.size(); ++i){
@@ -90,12 +94,6 @@ namespace engine {
 			entities.push_back(e);
 			return e;
 		}
-	};
-
-	struct TransformmComponent: public Component{
-		TransformmComponent(int x, int y): x(x), y(y){}
-		int x;
-		int y;
 	};
 
 	struct TransformComponent: public Component{

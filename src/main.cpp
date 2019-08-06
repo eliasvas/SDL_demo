@@ -294,7 +294,6 @@ int main(int argc, char ** argv){
 
 	Tile* tileSet[TOTAL_TILES];
 	if(!loadMedia(tileSet))printf("couldnt load tileset!");
-	printf("%d\n", manager.entities.size());
 	player p (32,32,&camera,&playerTexture,2,2);
 
 	while (!quit){
@@ -325,9 +324,6 @@ int main(int argc, char ** argv){
 		SDL_SetRenderDrawColor(gRenderer,0,0,0,0xff);
 		SDL_RenderClear(gRenderer);
 		SDL_SetRenderDrawColor(gRenderer,0xff,0,0,0xff);
-		for (int i = 0; i < TOTAL_TILES; ++i){
-			//tileSet[i]->render(camera);
-		}
 		manager.render();
 		SDL_RenderPresent(gRenderer);
 		frameTime = SDL_GetTicks() - frameStart;
